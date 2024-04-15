@@ -1,14 +1,13 @@
-from rest_framework import serializers
 from .models import *
+from rest_framework.serializers import ModelSerializer
 
-
-class CategorySerializers(serializers.ModelSerializer):
+class CategorySerializers(ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
 
-class ClothesSerializers(serializers.ModelSerializer):
+class ClothesSerializers(ModelSerializer):
     class Meta:
         model = Clothes
         fields = '__all__'
