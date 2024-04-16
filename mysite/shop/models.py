@@ -9,11 +9,15 @@ class Category(models.Model):
 
 
 class Clothes(models.Model):
-    title_clothes = models.CharField(max_length=100)
+    title_clothes = models.CharField(max_length=100, verbose_name="модель")
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title_clothes
+
+
+class Color(models.Model):
+    name = models.CharField(max_length=50)
 
 
 class Product(models.Model):
@@ -29,9 +33,12 @@ class Product(models.Model):
         ("60-64 4XL", "66-70 5XL")
     )
     size = models.CharField(verbose_name='размер', max_length=16, choices=CHOICES_SIZE)
-    price = models.PositiveSmallIntegerField(default=0)
-    description = models.TextField()
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(verbose_name='описание')
     color = models.CharField(verbose_name='цвет', max_length=16)
+    stars = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)],
+                                default=1, verbose_name="Оценка")
+    data = models.DateField(auto_now=True, blank=True, null=True)
 
     def __str__(self):
         return self.title_product
@@ -50,3 +57,28 @@ class Person(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(Person, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+
+class Basket(models.Model):
+    user = models.ForeignKey(Person, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_favorite', default=1)
+    count = models.PositiveIntegerField(verbose_name='количество товара', default=1)
+    summ_products = models.IntegerField(verbose_name="общая сумма")
+
+
+class Order(models.Model):
+    user = models.ForeignKey(Person, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Basket)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class News(models.Model):
+    name = models.CharField(max_length=500)
+    description = models.TextField()
+    photo = models.ImageField(upload_to="images/news/", blank=True, null=True)
+    data = models.DateField(auto_now=True,blank=True, null=True)
